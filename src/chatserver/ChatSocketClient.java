@@ -34,6 +34,7 @@ public class ChatSocketClient {
             Logger.getLogger(ChatSocketClient.class.getName()).log(Level.SEVERE, null, ex);
         }
         server.clients.add(this); // добавляем клиента в список клиентов на сервере
+        readAsync();
     }
     
     public void readAsync() {
@@ -44,11 +45,12 @@ public class ChatSocketClient {
                 int countReadByte = 0;
                 byte[] tempBuffer = new byte[4096]; // буффер для чтения с сокета
                 while (true) {
-                    if (client != null) {
+                    if (inStream != null) {
                         byte[] buffer; // конечный буффер прочитанных байт нужной размерности
                         try {
                             countReadByte = inStream.read(tempBuffer, 0, tempBuffer.length);
                             buffer = Arrays.copyOf(tempBuffer, countReadByte);
+                            System.out.println(new String(buffer));
                             for(ChatSocketClient item : server.clients) { // цикл по всем клиентам
                                 if(item != localClient) { // если итем не совпадает с текущим клинетом, то отправить сообщение
                                     item.writeAsync(buffer);
@@ -57,6 +59,9 @@ public class ChatSocketClient {
                         } catch (IOException ex) {
                             Logger.getLogger(ChatSocketClient.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                    }
+                    else {
+                        break;
                     }
                 }
             }
