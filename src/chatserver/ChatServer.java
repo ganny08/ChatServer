@@ -6,8 +6,6 @@
 package chatserver;
 
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -19,19 +17,20 @@ public class ChatServer {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        System.out.println("Test");
+        System.out.print("Введите порт сервера -> ");
+        int port = new Scanner(System.in, "UTF-8").nextInt();
+        ChatSocketServer server = new ChatSocketServer(port);
         readFromConsole();
-        ChatSocketServer server = new ChatSocketServer();
         server.acceptAsync();
     }
     
     public static void readFromConsole() {
-        Scanner scanner = new Scanner(System.in);
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Scanner scanner = new Scanner(System.in);
                 while(true) {
-                    String command = scanner.next();
+                    String command = scanner.nextLine();
                     System.out.println("Введено: " + command);
                 }
             }

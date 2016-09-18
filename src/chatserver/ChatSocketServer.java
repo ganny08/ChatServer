@@ -22,9 +22,9 @@ public class ChatSocketServer {
     ServerSocket server;
     volatile public ArrayList<ChatSocketClient> clients;
     
-    public ChatSocketServer() {
+    public ChatSocketServer(int port) {
         try {
-            server = new ServerSocket(49999);
+            server = new ServerSocket(port);
             clients = new ArrayList<ChatSocketClient>();
         } catch (Exception e) {
             System.out.println(e.getMessage());

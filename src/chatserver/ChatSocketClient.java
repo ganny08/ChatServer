@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,19 +51,26 @@ public class ChatSocketClient {
                         try {
                             countReadByte = inStream.read(tempBuffer, 0, tempBuffer.length);
                             buffer = Arrays.copyOf(tempBuffer, countReadByte);
-                            System.out.println(new String(buffer));
+                            System.out.println(new String(buffer, Charset.forName("cp866")));
                             for(ChatSocketClient item : server.clients) { // цикл по всем клиентам
                                 if(item != localClient) { // если итем не совпадает с текущим клинетом, то отправить сообщение
                                     item.writeAsync(buffer);
                                 }
                             }
-                        } catch (IOException ex) {
-                            Logger.getLogger(ChatSocketClient.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception ex) {
+                            System.out.println("Ошибка чтения с сокета");
+                            break;
                         }
                     }
                     else {
                         break;
                     }
+                }
+                try {
+                    server.clients.remove(localClient);
+                    inStream.close(); // закрываем поток на чтение
+                } catch (Exception ex) {
+                    System.out.println("Ошибка");
                 }
             }
         }).start();
