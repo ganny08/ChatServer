@@ -34,7 +34,7 @@ public class ChatServerHelper {
     public ChatServerHelper(ChatSocketServer server) {
         this.server = server;
         //clients = new ConcurrentHashMap<String, ChatSocketClient>();
-        xmlParser = new XmlParser("E:\\NetBeans\\ChatServer\\DataBase.xml");
+        xmlParser = new XmlParser("DataBase.xml");
     }
         
     public void parsingPackage(byte[] buffer, String token) {
