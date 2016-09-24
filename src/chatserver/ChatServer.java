@@ -20,21 +20,11 @@ public class ChatServer {
         System.out.print("Введите порт сервера -> ");
         int port = new Scanner(System.in, "UTF-8").nextInt();
         ChatSocketServer server = new ChatSocketServer(port);
-        readFromConsole();
+        ConsoleHelper consoleHelper = new ConsoleHelper(server);
+        consoleHelper.readFromConsole();
         server.acceptAsync();
     }
     
-    public static void readFromConsole() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Scanner scanner = new Scanner(System.in);
-                while(true) {
-                    String command = scanner.nextLine();
-                    System.out.println("Введено: " + command);
-                }
-            }
-        }).start();
-    }
+    
     
 }

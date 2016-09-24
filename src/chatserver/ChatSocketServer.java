@@ -7,9 +7,9 @@ package chatserver;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,12 +20,14 @@ import java.util.logging.Logger;
 public class ChatSocketServer {
     
     ServerSocket server;
-    volatile public ArrayList<ChatSocketClient> clients;
+    public ConcurrentHashMap<String,ChatSocketClient> clients;
+    volatile ChatServerHelper chatServerHelper;
     
     public ChatSocketServer(int port) {
         try {
+            clients = new ConcurrentHashMap<String, ChatSocketClient>();
             server = new ServerSocket(port);
-            clients = new ArrayList<ChatSocketClient>();
+            chatServerHelper = new ChatServerHelper(this);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -39,6 +41,9 @@ public class ChatSocketServer {
                 while(true) {
             try {
                 ChatSocketClient client = new ChatSocketClient(serverForClient, server.accept());
+                String authToken = "Guest" + ChatServerHelper.getGuest();
+                clients.put(authToken, client);
+                client.setAuthToken(authToken);
                 System.out.println("Подключился клиент: " + 
                         client.client.getInetAddress() + ": " + client.client.getPort() );
             } catch (IOException ex) {

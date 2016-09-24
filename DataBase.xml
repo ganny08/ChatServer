@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><DataBase>
+    <Table name="Users">
+        <Row>
+            <login>ganny</login>
+            <password>1234</password>
+            <token>g1234y</token>
+        </Row>
+		<Row>
+			<login>ganny08</login>
+			<password>4321</password>
+			<token>7T18N4</token>
+		</Row>
+	</Table>
+</DataBase>

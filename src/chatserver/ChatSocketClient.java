@@ -8,7 +8,6 @@ package chatserver;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -20,22 +19,29 @@ import java.util.logging.Logger;
  * @author Kirill
  */
 public class ChatSocketClient {
-    ChatSocketServer server;
+    ChatServerHelper serverHelper;
     Socket client;
     InputStream inStream;
     OutputStream outStream;
+    String authToken;
 
     public ChatSocketClient(ChatSocketServer server, Socket client) {
         this.client = client;
-        this.server = server;
+        serverHelper = new ChatServerHelper(server);
         try {    
             inStream = client.getInputStream(); // создаем поток на чтение
             outStream = client.getOutputStream();
         } catch (IOException ex) {
             Logger.getLogger(ChatSocketClient.class.getName()).log(Level.SEVERE, null, ex);
         }
-        server.clients.add(this); // добавляем клиента в список клиентов на сервере
+        //authToken = "Guest" + ChatServerHelper.getGuest();
+        //server.chatServerHelper.clients.put(authToken, this); // добавляем клиента в список клиентов с гостевым ключом
+        
         readAsync();
+    }
+    
+    public void setAuthToken(String token) {
+        authToken = token;
     }
     
     public void readAsync() {
@@ -51,14 +57,10 @@ public class ChatSocketClient {
                         try {
                             countReadByte = inStream.read(tempBuffer, 0, tempBuffer.length);
                             buffer = Arrays.copyOf(tempBuffer, countReadByte);
-                            System.out.println(new String(buffer, Charset.forName("cp866")));
-                            for(ChatSocketClient item : server.clients) { // цикл по всем клиентам
-                                if(item != localClient) { // если итем не совпадает с текущим клинетом, то отправить сообщение
-                                    item.writeAsync(buffer);
-                                }
-                            }
+                            //System.out.println(buffer.toString());
+                            serverHelper.parsingPackage(buffer, authToken);
                         } catch (Exception ex) {
-                            System.out.println("Ошибка чтения с сокета");
+                            //System.out.println("Ошибка чтения с сокета: " + ex);
                             break;
                         }
                     }
@@ -67,8 +69,8 @@ public class ChatSocketClient {
                     }
                 }
                 try {
-                    server.clients.remove(localClient);
-                    inStream.close(); // закрываем поток на чтение
+                    client.close();
+                    serverHelper.server.clients.remove(authToken); // удаляем клиента из списка
                 } catch (Exception ex) {
                     System.out.println("Ошибка");
                 }
